@@ -1,10 +1,6 @@
 name: 刷步数
 
 on:
-  #push:
-  #  branches: [ main ]
-  #pull_request:
-  #  branches: [ main ]
   schedule:
     - cron: '30 0,4,7,10,12,14 * * *'
   watch:
@@ -17,21 +13,31 @@ jobs:
     steps:
       - name: Checkout codes
         uses: actions/checkout@v2
-      - name: Update system and install zsh
+        
+      - name: 更新系统并安装依赖
         run: |
-          sudo -E apt-get -qq update
-          sudo -E apt-get install zsh -y
+          sudo apt-get update
+          sudo apt-get install -y zsh
           
-      - name: 初始化Python
+      - name: 设置Python环境
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
           
-      - name: 开始
+      - name: 安装Python依赖
+        run: pip3 install requests
+        
+      - name: 执行主程序
         run: |
-          pip3 install requests
-          user='${{ secrets.USER }}'
-          passwd='${{ secrets.PWD }}' 
-          open_get_weather='${{ secrets.OPEN_GET_WEATHER }}'
-          area='${{ secrets.AREA }}'
-          python3 main.py ${user} ${passwd} ${open_get_weather} ${area}
+          user="${{ secrets.USER }}"
+          passwd="${{ secrets.PWD }}" 
+          open_get_weather="${{ secrets.OPEN_GET_WEATHER }}"
+          area="${{ secrets.AREA }}"
+          
+          # 检查必要的密钥是否存在
+          if [ -z "$user" ] || [ -z "$passwd" ]; then
+            echo "错误：必须设置 USER 和 PWD 密钥"
+            exit 1
+          fi
+          
+          python3 main.py "$user" "$passwd" "$open_get_weather" "$area"
