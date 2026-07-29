@@ -2,7 +2,7 @@ name: 刷步数
 
 on:
   schedule:
-  - cron: '52 18 * * *'   # 北京时间每天凌晨2点运行（UTC 18:00）
+  - cron: '34 18 * * *'   # 北京时间每天凌晨2点运行（UTC 18:00）
   workflow_dispatch:
 
 jobs:
