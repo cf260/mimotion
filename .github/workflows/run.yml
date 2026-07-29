@@ -7,6 +7,7 @@ on:
   - cron: '0 19 * * *'   # 北京时间每天凌晨3点运行（UTC 19:00）
   - cron: '0 2 * * *'    # 北京时间每天上午10点运行（UTC 2:00）
   - cron: '0 3 * * *'    # 北京时间每天上午11点运行（UTC 3:00）
+  - cron: '0 6 * * *'    # 北京时间每天下午14点运行（UTC 6:00）
   workflow_dispatch:
 
 jobs:
@@ -35,7 +36,6 @@ jobs:
         run: |
           pip3 install requests pytz pycryptodome
           python3 main.py
-
       - name: persist tokens
         run: |
           git config user.name github-actions
