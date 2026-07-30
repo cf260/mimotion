@@ -35,20 +35,26 @@ function hours_except_now {
   cron_hours=$1
   hour=$(TZ=UTC date '+%H')
   hour=$((10#$hour))
-  # 使用数组更可靠
-  IFS=',' read -ra hours_array <<< "$cron_hours"
-  result_array=()
-  for h in "${hours_array[@]}"; do
-    if [[ $h -ne $hour ]]; then
-      result_array+=("$h")
+  except_current_hours=$(echo "$cron_hours" | awk -v hour="$hour" -F ',' '{
+    for (i=1;i<=NF;i++) {
+      if ($i!=hour) {
+        print $i
+      }
+    }
+  }')
+  result=""
+  while IFS= read -r line; do
+    if [ -z "$result" ]; then
+      result="$line"
+    else
+      result="$result,$line"
     fi
-  done
-  if [[ ${#result_array[@]} -eq 0 ]]; then
-    echo "$cron_hours"
-  else
-    # 用逗号连接数组元素，确保没有多余换行
-    IFS=','; echo "${result_array[*]}"; IFS=' '
+  done <<< "$except_current_hours"
+  if test -z "$result"; then
+    # 只有一个小时，则直接返回当前值
+    result=$cron_hours
   fi
+  echo "$result"
 }
 
 function convert_utc_to_shanghai {
@@ -102,4 +108,3 @@ function persist_execute_log {
   } >> cron_change_time
 
 }
-
